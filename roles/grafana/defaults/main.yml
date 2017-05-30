@@ -1,0 +1,22 @@
+---
+# defaults file for grafana
+#Graphite Settings
+whisper_url: https://github.com/graphite-project/whisper/tarball/master
+carbon_url: https://github.com/graphite-project/carbon/tarball/master
+graphite_web_url: https://github.com/graphite-project/graphite-web/tarball/master
+graphite_app: /app/graphite
+graphite_lib: "{{ graphite_app }}/lib"
+graphite_conf_loc: "{{ graphite_app }}/conf"
+graphite_pip_extra_args: --install-option="--prefix={{ graphite_app }}" --install-option="--install-lib={{ graphite_lib }}"
+pythonpath_env: /app/graphite/lib/:/app/graphite/webapp/
+graphite_secret_key: secret
+
+#Httpd Settings
+graphite_server_name: graphite
+graphite_port: 8080
+httpd_user: apache
+httpd_conf: /etc/httpd/conf
+httpd_vhosts: /etc/httpd/conf.d
+httpd_document_root: /app/graphite/webapp
+graphite_error_log: /log/graphite/storage/log/webapp/error.log
+graphite_access_log: /log/graphite/storage/log/webapp/access.log

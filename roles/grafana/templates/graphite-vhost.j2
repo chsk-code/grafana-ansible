@@ -1,0 +1,59 @@
+<VirtualHost *:{{ graphite_port }}>
+         ServerName {{ graphite_server_name }}
+         DocumentRoot "{{ httpd_document_root }}"
+         ErrorLog {{ graphite_error_log }}
+         CustomLog {{ graphite_access_log }} common
+
+         Header set Access-Control-Allow-Origin "*"
+         Header set Access-Control-Allow-Methods "GET, OPTIONS"
+         Header set Access-Control-Allow-Headers "origin, authorization, accept"                                 
+
+         # I've found that an equal number of processes & threads tends
+         # to show the best performance for Graphite (ymmv).
+         WSGIDaemonProcess graphite processes=5 threads=5 display-name='%{GROUP}' inactivity-timeout=120
+         WSGIProcessGroup graphite
+         WSGIApplicationGroup %{GLOBAL}
+         WSGIImportScript {{ graphite_conf_loc }}/graphite.wsgi process-group=graphite application-group=%{GLOBAL}
+
+         # XXX You will need to create this file! There is a graphite.wsgi.example
+         # file in this directory that you can safely use, just copy it to graphite.wgsi
+         WSGIScriptAlias / {{ graphite_conf_loc }}/graphite.wsgi
+
+
+         # XXX To serve static files, either:
+         # * Install the whitenoise Python package (pip install whitenoise)
+         # * Collect static files in a directory by running:
+         #     django-admin.py collectstatic --noinput --settings=graphite.settings
+         #   And set an alias to serve static files with Apache:
+         Alias /static/ {{ graphite_app }}/static/
+
+         ########################
+         # URL-prefixed install #
+         ########################
+         # If using URL_PREFIX in local_settings for URL-prefixed install (that is not located at "/"))
+         # your WSGIScriptAlias line should look like the following (e.g. URL_PREFX="/graphite"
+
+         # WSGIScriptAlias /graphite /srv/graphite-web/conf/graphite.wsgi/graphite
+         # Alias /graphite/static /app/graphite/webapp/content
+         #  <Location "/graphite/static/">
+         #        SetHandler None
+         # </Location>
+
+
+         # XXX In order for the django admin site media to work you
+         # must change @DJANGO_ROOT@ to be the path to your django
+         # installation, which is probably something like:
+         # /usr/lib/python2.6/site-packages/django
+         Alias /media/ "@DJANGO_ROOT@/contrib/admin/media/"
+
+         # The graphite.wsgi file has to be accessible by apache. It won't
+         # be visible to clients because of the DocumentRoot though.
+         <Directory {{ graphite_app }}/>
+                 <IfVersion < 2.4>
+                         Order deny,allow
+                         Allow from all
+                 </IfVersion>
+                 <IfVersion >= 2.4>
+                         Require all granted
+                 </IfVersion>
+         </Directory>

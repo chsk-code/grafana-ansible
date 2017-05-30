@@ -1,0 +1,5 @@
+---
+# defaults file for epel-repo
+epel_repo_url: "http://dl.fedoraproject.org/pub/epel/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/e/epel-release-{{ ansible_distribution_major_version }}-9.noarch.rpm"
+epel_repo_gpg_key_url: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+epel_repofile_path: "/etc/yum.repos.d/epel.repo"

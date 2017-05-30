@@ -1,0 +1,124 @@
+---
+# tasks file for grafana
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+    update_cache: yes
+  tags: system-updates
+
+- name: Installing required Yum packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ yumlist }}"
+  tags: yumlist
+
+- name: Upgrade pip
+  pip:
+    name: pip
+    extra_args: --upgrade
+  tags: pipupgrade
+
+- name: Installing required PIP packages
+  pip:
+    name: "{{ item.name }}"
+    version: "{{ item.version | default(omit) }}"
+  with_items:
+    - "{{ piplist }}"
+  tags: piplist
+
+- name: Installing Whisper
+  pip:
+    name: "{{ whisper_url }}"
+  environment:
+    PYTHONPATH: "{{ pythonpath_env }}"
+  tags: whisper
+
+- name: Installing Carbon and Graphite-Web
+  pip:
+    name: "{{ item }}"
+    extra_args: "{{ graphite_pip_extra_args }}"
+  with_items:
+    - "{{ carbon_url }}"
+    - "{{ graphite_web_url }}"
+  environment:
+    PYTHONPATH: "{{ pythonpath_env }}"
+  tags: carbon
+
+- name: Update Configuration
+  synchronize:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - "{{ graphite_conf }}"
+  delegate_to: "{{ inventory_hostname }}"
+  tags: graphite-conf
+
+- name: Local Settings Update
+  copy:
+    src: "{{ graphite_app }}/lib/graphite/local_settings.py.example"
+    dest: "{{ graphite_app }}/lib/graphite/local_settings.py"
+    remote_src: true
+  tags: local-settings
+
+- name: Updating Local Settings Secret Key
+  lineinfile:
+    path: "{{ graphite_app }}/lib/graphite/local_settings.py"
+    regexp: '^SECRET_KEY'
+    insertafter: '^#SECRET_KEY'
+    line: 'SECRET_KEY = {{ graphite_secret_key }}'
+  tags: local-secret-key
+
+- name: Updating Time Zone in Local Settings
+  lineinfile:
+    path: "{{ graphite_app }}/lib/graphite/local_settings.py"
+    regexp: '^TIME_ZONE'
+    insertafter: '^#TIME_ZONE'
+    line: "TIME_ZONE = 'America/Los_Angeles'"
+  tags: time-zone
+
+- name: Carbon Tuning
+  replace:
+    path: "{{ graphite_conf_loc }}/carbon.conf"
+    regexp: '^MAX_CREATES_PER_MINUTE = 50'
+    replace: "MAX_CREATES_PER_MINUTE = 600"
+  tags: carbon-tune
+
+- name: Checking permissions on Graphite
+  stat:
+    path: "{{ graphite_app }}/storage"
+  register: permissions
+  tags: check
+
+- name: Set permissions on Graphite
+  file:
+    path: "{{ graphite_app }}/storage"
+    owner: "{{ httpd_user }}"
+    group: "{{ httpd_user }}"
+    recurse: yes
+  when: permissions.stat.pw_name != 'httpd_user'
+  tags: check
+
+- name: Updating HTTPD ServerName
+  lineinfile:
+    path: "{{ httpd_conf }}/httpd.conf"
+    regexp: '^ServerName'
+    insertafter: '^#ServerName'
+    line: "ServerName {{ graphite_server_name }}"
+  tags: servername
+
+- name: Updating HTTPD Graphite Port
+  replace:
+    path: "{{ httpd_conf }}/httpd.conf"
+    regexp: '^Listen 80'
+    replace: "Listen {{ graphite_port }}"
+  tags: port
+
+- name: Updating the Graphite Vhost Conf
+  template:
+    src: graphite-vhost.j2
+    dest: "{{ httpd_vhosts }}/graphite-vhost.conf"
+    backup: yes
+  tags: vhost

@@ -1,0 +1,7 @@
+[grafana:vars]
+ansible_user=root
+ansible_pass=" "
+ansible_sudo_pass=" "
+
+[grafana]
+grafana1 ansible_host=173.26.26.222

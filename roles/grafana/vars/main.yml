@@ -1,0 +1,56 @@
+---
+# vars file for grafana
+graphite_conf:
+  - { src: "{{ graphite_app }}/examples/example-graphite-vhost.conf" , dest: "{{ httpd_vhosts }}/graphite-vhost.conf" }
+  - { src: "{{ graphite_conf_loc }}/storage-schemas.conf.example", dest: "{{ graphite_conf_loc }}/storage-schemas.conf" }
+  - { src: "{{ graphite_conf_loc }}/storage-aggregation.conf.example", dest: "{{ graphite_conf_loc }}/storage-aggregation.conf" }
+  - { src: "{{ graphite_conf_loc }}/graphite.wsgi.example", dest: "{{ graphite_conf_loc }}/graphite.wsgi" }
+  - { src: "{{ graphite_conf_loc }}/graphTemplates.conf.example", dest: "{{ graphite_conf_loc }}/graphTemplates.conf" }
+  - { src: "{{ graphite_conf_loc }}/carbon.conf.example", dest: "{{ graphite_conf_loc }}/carbon.conf" }
+
+#Required List of Yum packages
+yumlist: ["@Development tools",
+          'fontconfig',
+          'git',
+          'httpd',
+          'pycairo',
+          'python-devel',
+          'openssl-devel',
+          'dejavu-sans-fonts',
+          'gcc',
+          'gcc-c++',
+          'unzip',
+          'lsof',
+          'pytz',
+          'nc',
+          'net-tools',
+          'telnet-server',
+          'telnet',
+          'perl',
+          'libffi-devel',
+          'cairo-devel',
+          'python-zope-interface',
+          'python-ldap',
+          'net-snmp',
+          'mod_wsgi',
+          'collectd',
+          'collectd-snmp',
+          'python-memcached',
+          'bitmap',
+          'bitmap-fonts',
+          'python-pip',
+          'npm'
+          ]
+
+piplist:
+  - { name: 'Twisted', version: '16.6.0' }
+  - { name: 'pyparsing', version: '2.0.7' }
+  - { name: 'Django', version: '1.9.12' }
+  - { name: 'django_tagging', version: '0.4.3' }
+  - { name: 'whitenoise' }
+  - { name: 'cairocffi' }
+  - { name: 'pyasn1' }
+  - { name: 'pyasn1-modules' }
+  - { name: 'scandir' }
+  - { name: 'txAMQP' }
+  - { name: 'service-identity' }

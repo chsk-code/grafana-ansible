@@ -1,0 +1,7 @@
+---
+- name: Grafana Installation
+  hosts: '{{ target }}'
+  become: true
+  roles:
+    - { role: epel-repo, tags: epel-repo }
+    - { role: grafana, tags: grafana }

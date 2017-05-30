@@ -1,0 +1,34 @@
+---
+#YumPackagesList
+          #    - "@Development tools"
+          #    - fontconfig
+          #    - git
+          #    - httpd
+          #    - pycairo
+          #    - python-devel
+          #    - dejavu-sans-fonts
+          #    - gcc
+          #    - gcc-c++
+          #    - unzip
+          #    - lsof
+          #    - pytz
+          #    - nc
+          #    - net-tools
+          #    - telnet-server
+          #    - telnet
+          #    - perl
+          #    - libffi-devel
+          #    - cairo-devel
+          #    - python-zope-interface
+          #    - python-ldap
+          #    - net-snmp
+          #    - mod_wsgi
+          #    - collectd
+          #    - collectd-snmp
+          #    - python-memcached
+          #    - bitmap
+          #    - bitmap-fonts
+          #    - python-pip
+          #    - node
+          #    - npm
+          #    - libffi-devel
